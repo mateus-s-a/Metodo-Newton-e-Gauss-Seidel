@@ -1,0 +1,1 @@
+# Metodo-Newton-e-Gauss-Seidel
