@@ -67,11 +67,8 @@ def metodo_newton_raphson(x0, Es, N0):
         x_novo = x_atual - fx / dfx
 
         # Cálculo do erro relativo percentual aproximado (E_a)
-        if abs(x_novo) < 1e-15:
-            # Evita divisão por zero se a estimativa da raiz for exatamente zero
-            ea = 0.0
-        else:
-            ea = abs((x_novo - x_atual) / x_novo) * 100
+        # Evita divisão por zero/falsa convergência usando max(abs(x_novo), 1e-15) no denominador
+        ea = abs((x_novo - x_atual) / max(abs(x_novo), 1e-15)) * 100
 
         iteracoes.append({
             'Iteracao': i,

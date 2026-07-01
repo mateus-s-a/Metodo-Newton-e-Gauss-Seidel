@@ -85,6 +85,10 @@ def metodo_gauss_seidel(A, b, x0, Es, N0):
         mensagem (str): Descrição textual do encerramento.
     """
     n = len(A)
+    # Validação de dimensões
+    if len(b) != n or len(x0) != n or any(len(row) != n for row in A):
+        raise ValueError("Erro de Dimensões: As dimensões de A, b e x0 devem ser compatíveis e A deve ser uma matriz quadrada.")
+
     x = list(x0)
     iteracoes = []
     sucesso = False
@@ -111,10 +115,8 @@ def metodo_gauss_seidel(A, b, x0, Es, N0):
             x[i] = (b[i] - soma) / A[i][i]
 
             # Erro relativo percentual aproximado para a variável x_i
-            if abs(x[i]) < 1e-15:
-                ea_i = 0.0
-            else:
-                ea_i = abs((x[i] - x_velho[i]) / x[i]) * 100
+            # Evita divisão por zero/falsa convergência usando max(abs(x[i]), 1e-15) no denominador
+            ea_i = abs((x[i] - x_velho[i]) / max(abs(x[i]), 1e-15)) * 100
             erros_etapa.append(ea_i)
 
         erro_max = max(erros_etapa)
