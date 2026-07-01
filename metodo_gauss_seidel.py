@@ -315,6 +315,16 @@ def main():
         b = b_padrao
         n = 3
 
+    # Se houver elementos nulos na diagonal principal, tenta reordenar antes de fazer a análise
+    if any(abs(A[i][i]) < 1e-12 for i in range(n)):
+        print("\n[AVISO] Elemento nulo detectado na diagonal principal. Tentando reordenar o sistema...")
+        try:
+            A, b = reordenar_sistema(A, b)
+            print("[OK] Sistema reordenado com sucesso para remover zeros da diagonal!")
+        except ValueError as err:
+            print(f"\n[ERRO] {err}")
+            return
+
     # Análise matemática de convergência
     diag_dominante = check_diagonal_dominance(A)
     sassenfeld_ok, beta_max = check_sassenfeld(A)

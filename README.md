@@ -53,6 +53,26 @@ Substituindo na fórmula geral de Newton-Raphson, a iteração simplificada se t
 
 $$x_{i+1} = x_i - \frac{x_i^3 - x_i - 2}{3x_i^2 - 1}$$
 
+### Exemplos Interessantes para Demonstração
+
+Para fins de apresentação e análise de comportamento matemático de Newton-Raphson com a função de trabalho $f(x) = x^3 - x - 2$, recomenda-se testar os seguintes cenários:
+
+#### 1. Caso Ideal: Convergência Quadrática Rápida
+*   **Parâmetros de Entrada:**
+    *   Chute Inicial ($x_0$): `2.0` (ou `1.5`)
+    *   Tolerância ($E_s$): `1e-6` ($0.000001\%$)
+    *   Iterações Máximas ($N_0$): `10`
+*   **Comportamento:** O método converge com sucesso absoluto em apenas **5 iterações**. Isso ocorre porque o chute inicial está próximo à raiz real ($\approx 1.52138$) e em uma região estável e convexa da função.
+*   **Significado Matemático:** Ilustra a principal vantagem prática do Método de Newton-Raphson: quando bem posicionado, o número de algarismos significativos corretos dobra a cada iteração.
+
+#### 2. Caso de Instabilidade: Fenômeno do "Salto" (Overshoot)
+*   **Parâmetros de Entrada:**
+    *   Chute Inicial ($x_0$): `0.57` *(ponto muito próximo ao extremo local mínimo em $x \approx 0.57735$, onde a derivada $f'(x)$ tende a zero)*
+    *   Tolerância ($E_s$): `1e-6` ($0.000001\%$)
+    *   Iterações Máximas ($N_0$): `50`
+*   **Comportamento:** Por conta de a derivada ser extremamente próxima de zero ($f'(0.57) \approx -0.0253$), a reta tangente é quase horizontal, projetando a aproximação seguinte para muito longe: **$x_1 \approx -93.69$**. A partir desse valor distante, o algoritmo leva **24 iterações** para retornar e convergir para a raiz exata.
+*   **Significado Matemático:** Demonstra graficamente a sensibilidade do método ao chute inicial. Zonas de derivadas nulas ou quase nulas fazem a reta tangente "chutar" as iterações para fora da área de interesse, retardando consideravelmente a convergência ou provocando divergência se o limite $N_0$ for muito restrito.
+
 ### Visualização Gráfica
 Ao término da execução, o script gera e salva automaticamente o gráfico `grafico_newton.png`. Este gráfico plota a curva da função $f(x) = x^3 - x - 2$, destaca no eixo $x$ o ponto exato da raiz encontrada pelo método de Newton-Raphson, e ilustra os passos ou retas tangentes de convergência.
 
@@ -99,6 +119,63 @@ $$x_1^{(k+1)} = \frac{27 - 2x_2^{(k)} + x_3^{(k)}}{10}$$
 $$x_2^{(k+1)} = \frac{-61.5 + 3x_1^{(k+1)} - 2x_3^{(k)}}{-6}$$
 
 $$x_3^{(k+1)} = \frac{-21.5 - x_1^{(k+1)} - x_2^{(k+1)}}{5}$$
+
+### Exemplos Interessantes para Demonstração
+
+Para fins de demonstração do Método de Gauss-Seidel, recomenda-se testar os seguintes cenários:
+
+#### 1. Caso de Independência do Chute Inicial (Sistema Padrão)
+*   **Parâmetros de Entrada:**
+    *   Escolha do Sistema: Padrão (`P`)
+    *   Chute Inicial ($x_0$): `[1000.0, -1000.0, 1000.0]` *(chute inicial muito distante da solução real)*
+    *   Tolerância ($E_s$): `1e-5` ($0.00001\%$)
+    *   Iterações Máximas ($N_0$): `100`
+*   **Comportamento:** O algoritmo converge perfeitamente para a solução exata $x = [3.0, 12.5, -7.0]$ em apenas **12 iterações**.
+*   **Significado Matemático:** Comprova graficamente a robustez e a propriedade de convergência global do método. Quando a matriz é estritamente diagonal dominante, o algoritmo garante a convergência independente de quão absurdo ou distante seja o chute inicial escolhido.
+
+#### 2. Caso de Matriz não Diagonal Dominante, mas Convergente (Sassenfeld)
+*   **Parâmetros de Entrada:**
+    *   Escolha do Sistema: Customizado (`C`)
+    *   Ordem do Sistema ($n$): `3`
+    *   Linhas da Matriz $A$:
+        *   Linha 1: `2 1 0`
+        *   Linha 2: `3 4 2`
+        *   Linha 3: `0 1 2`
+    *   Vetor $b$: `5 17 5` *(Solução exata: $[1.0, 3.0, 1.0]$)*
+    *   Equações Iterativas:
+        $$
+        \begin{cases}
+        2x_1 + x_2 = 5 \\
+        3x_1 + 4x_2 + 2x_3 = 17 \\
+        x_2 + 2x_3 = 5
+        \end{cases}
+        $$
+        $$
+        x_1^{(k+1)} = \frac{5 - x_2^{(k)}}{2}\\
+        x_2^{(k+1)} = \frac{17 - 3x_1^{(k+1)} - 2x_3^{(k)}}{4}\\
+        x_3^{(k+1)} = \frac{5 - x_2^{(k+1)}}{2}
+        $$
+    *   Chute Inicial ($x_0$): `[0.0, 0.0, 0.0]`
+    *   Tolerância ($E_s$): `1e-4`
+    *   Iterações Máximas ($N_0$): `100`
+*   **Comportamento:** O script detectará e alertará que a matriz **não** atende ao critério clássico de dominância diagonal (na segunda linha, $|4| \le |3| + |2|$). No entanto, o script também calculará e mostrará que o **Critério de Sassenfeld** é atendido ($\beta_{max} = 0.875 < 1.0$), prosseguindo para a execução e convergência com sucesso absoluto em **10 iterações**.
+*   **Significado Matemático:** Demonstra a utilidade do Critério de Sassenfeld como uma ferramenta mais geral e robusta do que a dominância diagonal por linhas clássica, permitindo resolver numericamente sistemas que seriam descartados por análises mais simples.
+
+#### 3. Caso de Reordenação Automática de Linhas (Zeros na Diagonal)
+*   **Parâmetros de Entrada:**
+    *   Escolha do Sistema: Customizado (`C`)
+    *   Ordem do Sistema ($n$): `2`
+    *   Linhas da Matriz $A$:
+        *   Linha 1: `0 2`
+        *   Linha 2: `3 1`
+    *   Vetor $b$: `4 5` *(Solução exata: $[1.0, 2.0]$)*
+    *   Chute Inicial ($x_0$): `[0.0, 0.0]`
+    *   Tolerância ($E_s$): `1e-5`
+    *   Iterações Máximas ($N_0$): `50`
+*   **Comportamento:** O script detectará imediatamente a presença de um zero na diagonal principal ($a_{11} = 0$), o que impediria a divisão na iteração clássica de Gauss-Seidel, pois sofreria uma divisão por zero na 1ª iteração do método. O script executará a reordenação automática de linhas (permutando a linha 1 com a linha 2), resultando em um sistema equivalente com diagonal estritamente dominante e livre de zeros:
+    $$A' = \begin{pmatrix} 3 & 1 \\ 0 & 2 \end{pmatrix}, \quad b' = \begin{pmatrix} 5 \\ 4 \end{pmatrix}$$
+    A partir disso, o método converge com sucesso absoluto em apenas **3 iterações**.
+*   **Significado Matemático:** Demonstra a robustez computacional necessária na engenharia de algoritmos numéricos. O tratamento dinâmico de pivôs evita exceções de divisão por zero (indefinições matemáticas) e recupera sistemas teoricamente convergentes mesmo que fornecidos em ordem desfavorável.
 
 ### Visualização Gráfica
 Ao término da execução, o script gera e salva automaticamente o gráfico `grafico_gauss_seidel.png`. Este gráfico ilustra a evolução da estimativa de cada variável ($x_1, x_2, x_3$) ou do erro relativo aproximado a cada iteração, fornecendo uma visão clara do comportamento e velocidade de convergência do método.
