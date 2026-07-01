@@ -100,9 +100,23 @@ def gerar_grafico(iteracoes, raiz):
     Gera o gráfico contendo a curva da função, a raiz encontrada e as retas tangentes das iterações.
     Salva o arquivo final como 'grafico_newton.png'.
     """
-    # Define o intervalo do domínio para plotar a curva principal
-    x_min = min(raiz - 2.0, 0.0)
-    x_max = raiz + 2.0
+    # Coleta todos os pontos X de interesse para ajustar os limites do plano cartesiano
+    passos_plot = min(len(iteracoes), 5)
+    pontos_x = [raiz]
+    for idx in range(passos_plot):
+        pontos_x.append(iteracoes[idx]['xi'])
+        pontos_x.append(iteracoes[idx]['xi_mais_1'])
+    
+    x_min_pontos = min(pontos_x)
+    x_max_pontos = max(pontos_x)
+    
+    # Define limites horizontais com margem proporcional dinâmica (mínimo de 1.5 de folga nas laterais)
+    largura = x_max_pontos - x_min_pontos
+    folga = max(largura * 0.15, 1.5)
+    x_min = x_min_pontos - folga
+    x_max = x_max_pontos + folga
+
+    # Define o intervalo do domínio para plotar a curva principal com base nos limites dinâmicos
     x_vals = np.linspace(x_min, x_max, 500)
     y_vals = f(x_vals)
 
@@ -117,7 +131,6 @@ def gerar_grafico(iteracoes, raiz):
 
     # Desenha os passos de iteração (projeções verticais e tangentes)
     # Mostra no máximo as 5 primeiras iterações para evitar poluição visual do gráfico
-    passos_plot = min(len(iteracoes), 5)
     colors = plt.cm.plasma(np.linspace(0.2, 0.8, passos_plot))
 
     for idx in range(passos_plot):
@@ -138,6 +151,22 @@ def gerar_grafico(iteracoes, raiz):
         yt_vals = f_xi + df_xi * (t_vals - xi)
         plt.plot(t_vals, yt_vals, color=color, linestyle='-', linewidth=1.5, alpha=0.85,
                  label=f'Iteração {it["Iteracao"]} (x = {xi:.3f})')
+
+    # Limita o eixo Y proporcionalmente para focar na região onde as iterações ocorrem
+    pontos_y = [0.0]
+    for idx in range(passos_plot):
+        pontos_y.append(iteracoes[idx]['f_xi'])
+    
+    y_min_pontos = min(pontos_y)
+    y_max_pontos = max(pontos_y)
+    
+    altura = y_max_pontos - y_min_pontos
+    folga_y = max(altura * 0.15, 2.0)
+    y_min = y_min_pontos - folga_y
+    y_max = y_max_pontos + folga_y
+
+    plt.xlim(x_min, x_max)
+    plt.ylim(y_min, y_max)
 
     plt.title('Método de Newton-Raphson: Convergência da Raiz', fontsize=14, fontweight='bold', pad=15)
     plt.xlabel('x (Domínio)', fontsize=12)
