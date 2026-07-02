@@ -64,7 +64,7 @@ def metodo_newton_raphson(x0, Es, N0):
             mensagem = f"Erro de Instabilidade: Derivada nula ou muito próxima de zero (f'(x) = {dfx:.4e}) na iteração {i}. Execução abortada para evitar divisão por zero."
             break
 
-        x_novo = x_atual - fx / dfx
+        x_novo = x_atual - fx / dfx             # Fórmula Principal do Método de Newton-Raphson
 
         # Cálculo do erro relativo percentual aproximado (E_a)
         # Evita divisão por zero/falsa convergência usando max(abs(x_novo), 1e-15) no denominador

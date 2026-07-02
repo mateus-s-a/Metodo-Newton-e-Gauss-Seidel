@@ -137,7 +137,7 @@ def metodo_gauss_seidel(A, b, x0, Es, N0):
 
     return iteracoes, sucesso, x, mensagem
 
-def gerar_graficos(iteracoes, n):
+def gerar_graficos(iteracoes, n, x0=None):
     """
     Gera uma imagem de alta qualidade contendo dois subplots de convergência.
     Salva como 'grafico_gauss_seidel.png'.
@@ -145,15 +145,20 @@ def gerar_graficos(iteracoes, n):
     iters = [it['Iteracao'] for it in iteracoes]
     erro_max = [it['Erro_Maximo'] for it in iteracoes]
     
-    # Extrai o histórico dos valores de cada incógnita x_i
-    x_historico = {i: [it['x'][i] for it in iteracoes] for i in range(n)}
+    # Extrai o histórico dos valores de cada incógnita x_i incluindo o chute inicial (iteração 0)
+    if x0 is not None:
+        iters_x = [0] + iters
+        x_historico = {i: [x0[i]] + [it['x'][i] for it in iteracoes] for i in range(n)}
+    else:
+        iters_x = iters
+        x_historico = {i: [it['x'][i] for it in iteracoes] for i in range(n)}
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6), dpi=300)
 
     # Subplot 1: Trajetória dos valores das variáveis
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
     for i in range(n):
-        ax1.plot(iters, x_historico[i], marker='o', markersize=4,
+        ax1.plot(iters_x, x_historico[i], marker='o', markersize=4,
                  label=f'$x_{i+1}$', color=colors[i % len(colors)], linewidth=2)
     ax1.set_title('Evolução das Estimativas das Incógnitas ($x_i$)', fontsize=12, fontweight='bold')
     ax1.set_xlabel('Iterações', fontsize=10)
@@ -417,7 +422,7 @@ def main():
         print(f"Erro ao salvar arquivo de texto 'resultados_gauss_seidel.txt': {err}")
 
     try:
-        gerar_graficos(iteracoes, n)
+        gerar_graficos(iteracoes, n, x0)
         print("-> Gráfico duplo contendo o histórico de convergência salvo em 'grafico_gauss_seidel.png'.")
     except Exception as err:
         print(f"Erro ao gerar/salvar imagem 'grafico_gauss_seidel.png': {err}")
